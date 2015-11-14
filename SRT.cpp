@@ -8,7 +8,6 @@
 
 
 #include<iostream>
-#include<deque>
 #include<iomanip>
 using namespace std;
 
@@ -24,29 +23,41 @@ string addBitStrings( string first, string second );
 string substractB(string AQ, string B);
 string addB(string AQ, string B);
 void printOutput(string AQ);
-int checkInvalidInputs(string AQ, string B){
-	return 0;
-}
+string convertHexToBinary(string hexInput);
+int checkInvalidInputs(string AQ, string B);
+string properRemainder(string AQ);
 
 int main(){
-	deque<int> dividend, divisor;
 	string Q , A , B , AQ , comB;
-	//string Q , A , B = "01010", AQ = "0000110111" , comB;
-	//string Q , A , B = "01111", AQ = "0010100100" , comB;
-
-	//string Q , A , B = "011001", AQ = "000011001100" , comB;
-	//string Q , A , B = "01101", AQ = "0010110101" , comB;
-	//string Q , A , B = "00011", AQ = "0000010001" , comB;
 	int t = 0, T;
+
+	//input number of test cases
 	cin>>T;
+
 	while(t < T){
 		cin >> AQ >> B;
+
+		cout <<" -----------------------Test Case: "<<t+1<<"----------------------------";
+		cout <<setw(30)<<" The input is: " << AQ <<"    "<<B <<endl;
+
+		//check and convert the hexadecimal input to binary
+		AQ = convertHexToBinary(AQ);
+		B = convertHexToBinary(B);
+
+		//get rid of "." for calculations
+		AQ = AQ.substr(1, AQ.length());
+		B  = B.substr(1, B.length());
+
+		cout << setw(30)<<" The dividend length: " << AQ.length()<<endl;
+		cout<< setw(30)<<" The divisor length: "  << B.length()<<endl<<endl;
 
 		delay = 0 , totalNoOfShifts = 0;
 		int initAdj = 0, k = 0, BLen = B.length();
 		string normB = B;
+
 		//Check if the inputs are valid
 		int invalid = checkInvalidInputs(AQ, B) ;
+
 		if(invalid == -1)
 		{
 			cout <<" Invalid Inputs \n";
@@ -64,19 +75,19 @@ int main(){
 				else
 					break;
 			}
-			delay = delay + initAdj * 3; // 3 t for each shift required for normalizing B
+			delay = delay + initAdj * 3; // 3 Δt for each shift required for normalizing B
 
 			cout << setw(30) << "AQ = " << "." << AQ.substr(0, AQ.length()/2) <<"  "<< AQ.substr(AQ.length()/2, AQ.length()) << endl;
 			cout << setw(30) << "B = " << "." << B << endl;
-			cout << setw(30) <<"Normalized B = " << "." << normB <<endl << endl;
-			cout << setw(30) << "Total Delay in normalize B" << delay <<"\n";
-			//cout << " Adjusted position: "  << initAdj<< endl;
+			cout << setw(30) <<"Normalized B = " << "." << normB << setw(15)<<delay << "Δt"<<endl << endl;
+			
+
 			// STEP 2: Complement B
 			string tempNormB = normB;
 			string tempComB = complement(tempNormB.insert(0,"0"));
 			delay  = delay + B.length(); // length of operand times t
-			cout<<setw(30)<<"Complement of Normalized B = " << tempComB.substr(0,1) <<"." << tempComB.substr(1, tempComB.length()) <<endl;
-			cout<<setw(30)<<" Total Delay after complementing B " << delay <<" \n";
+			cout<<setw(30)<<"Complement of Normalized B = " << tempComB.substr(0,1) <<"." << tempComB.substr(1, tempComB.length()) <<"     "<<delay<<"Δt"<<endl;
+		
 
 			cout<<setw(30)<<"------------------------INITIALIZATION-----------------------" <<endl;
 			cout << setw(30) << "."<<AQ.substr(0, AQ.length()/2) <<"  "<<AQ.substr(AQ.length()/2  , AQ.length()) <<endl;
@@ -84,7 +95,7 @@ int main(){
 			// STEP 3: Adjust AQ
 
 			delay = delay + initAdj * 3; // 3 t for each shift required for adjusting AQ
-			cout<<setw(30)<<"Total Delay after adjusting AQ: " << delay<<"\n";
+			
 			string adjAQ = AQ;
 			for(int i = 0; i < AQ.length() ; i++){
 				if(AQ[i] == '0' && initAdj > 0 ){
@@ -96,21 +107,17 @@ int main(){
 			AQ = adjAQ;
 			totalNoOfShifts += initAdj;
 
-			//cout << " Total number of shifts after normalization: " << totalNoOfShifts << endl;
-			//cout << " Total delay upto after normalization B: " << delay << endl;
-
 			//print the quotient and remainder
 			if(totalNoOfShifts > AQ.length()/2){
 				printOutput(AQ);
-				//break;
+			
 			}
-			cout << setw(30) << "Adjusted AQ: " << "." << adjAQ.substr(0, AQ.length()/2) << "  "<< AQ.substr(AQ.length()/2, AQ.length())<<endl;
+			cout << setw(30) << "Adjusted AQ: " << "." << adjAQ.substr(0, AQ.length()/2) << "  "<< AQ.substr(AQ.length()/2, AQ.length())<<
+			setw(15)<<delay<<"Δt"<<endl;
 
 			//STEP 4: Shift over 0's
-			
 			adjAQ = shiftOverZeros(AQ);
-			//cout << " Total number of shifts here: " << totalNoOfShifts << endl;
-			//cout << " Total delay upto adjusting AQ: " << delay << endl;
+			
 			// check if the quotient and remainder are generated
 			if(totalNoOfShifts > B.length()){
 				//end here;
@@ -122,27 +129,26 @@ int main(){
 			string resAQ;
 			char isPositive = '0'; //positive by default
 			//keep performing the operation unless total # of shifts is less than the operand bit length
-			while( totalNoOfShifts <= B.length() && adjAQ.compare("END")!= 0){
+			while( totalNoOfShifts <= B.length()){
 				
 				if(isPositive == '0'){
 					//STEP 5: Substract B
 					resAQ = substractB(AQ , normB);
 					cout << setw(30)<<"Negative Result : " << resAQ.substr(0,1)<<"."<<
-					resAQ.substr(1, resAQ.length()/2)<<"  "<<resAQ.substr(resAQ.length()/2+1, resAQ.length()) <<endl;
+					resAQ.substr(1, resAQ.length()/2)<<"  "<<resAQ.substr(resAQ.length()/2+1, resAQ.length()) 
+					<<setw(15)<<delay<<"Δt"<<endl;
 				}
 				else{
 					resAQ = addB(AQ , normB);
 					cout << setw(30)<<"Positive Result : " << resAQ.substr(0,1)<<"."<<
-					resAQ.substr(1, resAQ.length()/2)<<"  "<<resAQ.substr(resAQ.length()/2+1, resAQ.length()) <<endl;
-				
-					//cout << "The result after adding B is: " << resAQ << endl;
+					resAQ.substr(1, resAQ.length()/2)<<"  "<<resAQ.substr(resAQ.length()/2+1, resAQ.length())
+					<<setw(15)<<delay<<"Δt"<<endl;
 				}
 				
 				isPositive = resAQ[0];
 
 				resAQ = resAQ.substr(1);
-				//cout << " After substraction: " << resAQ << endl;
-				// STEP 6: If resAQ is a positive or negative value
+				
 				//STEP 6.1 : If resAQ is +ve,
 				if(isPositive == '0'){
 					//cout << endl << "The result is positive: " << endl ;
@@ -151,15 +157,13 @@ int main(){
 					resAQ = resAQ.substr(1);
 
 					delay = delay + 3; // 3 t delay for 1 shift
-					cout<<"Total Delay in shift AQ left and q0 <- 1" <<delay <<"\n";
+					
 					totalNoOfShifts += 1;
 
 					cout <<setw(30)<<"Shift AQ left, q0 <- 1 :  " <<"."
-					<<resAQ.substr(0,resAQ.length()/2)<<"  "<<resAQ.substr(resAQ.length()/2,resAQ.length()) << endl;
+					<<resAQ.substr(0,resAQ.length()/2)<<"  "<<resAQ.substr(resAQ.length()/2,resAQ.length()) 
+					<<setw(15)<<delay<<"Δt"<< endl;
 					
-					//cout <<"Shift AQ left, q0 <- 1 :  " << resAQ << endl;
-					//cout << " Total number of shifts here: " << totalNoOfShifts << endl;
-					//cout << " Total delay upto adjusting AQ: " << delay << endl;
 					//print the quotient and remainder
 					if(totalNoOfShifts > resAQ.length()/2){
 						AQ = resAQ;
@@ -172,12 +176,7 @@ int main(){
 						AQ = resAQ;
 						break;
 					}
-					//delay += noOfShiftsHere * 3; // 3 t for each shift
-					//cout << " Total number of shifts here: " << totalNoOfShifts << endl;
-					//cout << " Total delay upto adjusting AQ: " << delay << endl;
-
-					//cout << " After operations when result is positive : " << finalAQ << endl;
-
+					
 					AQ = resAQ;
 				}
 				
@@ -189,13 +188,14 @@ int main(){
 					resAQ = resAQ.substr(1);
 
 					delay = delay + 3; // 3 t delay for 1 shift
-					cout<<"Total Delay in shift AQ left and q0 <- 0" <<delay <<"\n";
+					//cout<<"Total Delay in shift AQ left and q0 <- 0" <<delay <<"\n";
 					totalNoOfShifts += 1;
 
 					cout <<setw(30)<<"Shift AQ left, q0 <- 0 :  " << "1"<<"."
-					<<resAQ.substr(0,resAQ.length()/2)<<"  "<<resAQ.substr(resAQ.length()/2,resAQ.length()) << endl;
-					//cout << " Total number of shifts here: " << totalNoOfShifts << endl;
-					//cout << " Total delay upto adjusting AQ: " << delay << endl;
+					<<resAQ.substr(0,resAQ.length()/2)<<"  "<<resAQ.substr(resAQ.length()/2,resAQ.length())
+					<<setw(15)<<delay<<"Δt" << endl;
+					
+
 					//print the quotient and remainder
 					if(totalNoOfShifts > resAQ.length()/2){
 						AQ = resAQ;
@@ -209,36 +209,31 @@ int main(){
 						break;
 					}
 					
-					//cout << " Total number of shifts here: " << totalNoOfShifts << endl;
-					//cout << " Total delay upto adjusting AQ: " << delay << endl;
-
 					AQ = resAQ;
 				}
 			}
 			// correct remainder
 			if( isPositive == '1'){
-				//cout <<  endl <<"Correction is required since Remainder is negative: " << AQ << endl << endl;
-				//cout << "The quotient is: " << AQ.substr(AQ.length()/2 ) << endl;
+				
 				string finalQ = AQ.substr(AQ.length()/2 );
 				A = getA (AQ.insert(0, "1"));
 
 				//shift right
 				string correctA = A;
 				correctA = correctA.substr(0, A.length() - 1 );
-				delay += (3 * (AQ.length()/2));
+				delay += 3; //TODO: Verify this
 
-				cout<<"After correcting remainder, "<< delay<<"\n";
-
-				cout << setw(30)<<"Correct remainer by  " << "1."<<correctA << endl;
+				cout << setw(30)<<"Correct remainer by  " << "1."<<correctA << setw(15)<<delay<<"Δt"<<endl;
 				cout << setw(30)<<"Shifting A and adding B  " <<"."<<normB<<endl;
 				cout << setw(38) << "--------"<<endl;
 				correctA = addBitStrings(correctA, normB);
 				cout << setw(33) << "0." <<correctA << endl;
 
 				cout<<setw(30)<<"------------------------RESULTS-------------------------------"<<endl;
-				cout <<setw(30)<<" QUOTIENT: "<< finalQ<<endl;
-				cout<<setw(30) <<" REMAINDER: "<<correctA<<endl;
-				cout <<setw(30)<< "DELAY: " << delay << " dt" <<endl;
+				cout <<setw(30)<<" QUOTIENT: ."<< finalQ<<endl;
+				cout<<setw(30) <<" REMAINDER: ."<<properRemainder(correctA)<<endl;
+				cout <<setw(30)<< "DELAY: " << delay << "Δt" <<endl;
+				cout <<" \n \n \n \n";
 			}
 			else{
 					printOutput(AQ);
@@ -296,7 +291,7 @@ string shiftOverZeros(string AQ){
 	string adjAQ = AQ;
 	int noOfShiftsHere = 0;
 	for( int i = 0 ; i < AQ.length() ; i ++){
-		if(totalNoOfShifts > adjAQ.length()/2){
+		if(totalNoOfShifts >= adjAQ.length()/2){
 				//cout << "Shifted over 0's : " << adjAQ << endl;
 				QUOTIENT = adjAQ.substr(0, adjAQ.length()/2);
 				REMAINDER = adjAQ.substr(adjAQ.length()/2+1 , adjAQ.length());
@@ -314,12 +309,12 @@ string shiftOverZeros(string AQ){
 		else
 			break;
 	}
-	if(noOfShiftsHere >0)
-		cout<< setw(30)<<"Shift Over 0's: " <<"."<< adjAQ.substr(0, adjAQ.length()/2) <<"  "<<adjAQ.substr(adjAQ.length()/2, adjAQ.length())<<endl;
-	
-	//cout << "Shifted over 0's : " << adjAQ << endl;
-	delay = delay + 3 * noOfShiftsHere; // each shift takes 3 * t
-	cout<<"Total Delay After shifting over 0's " << delay << "\n";
+	if(noOfShiftsHere >0){
+		delay = delay + 3 * noOfShiftsHere; // each shift takes 3 * t
+		cout<< setw(30)<<"Shift Over 0's: " <<"."<< adjAQ.substr(0, adjAQ.length()/2) <<"  "<<
+		adjAQ.substr(adjAQ.length()/2, adjAQ.length())<<setw(15)<<delay<<"Δt"<<endl;
+	}
+
 	return adjAQ;
 }
 
@@ -327,13 +322,10 @@ string shiftOverOnes(string AQ){
 	string adjAQ = AQ;
 	int noOfShiftsHere = 0;
 	for( int i = 0 ; i < AQ.length() ; i ++){
-		if(totalNoOfShifts > adjAQ.length()/2){
-				//cout << "Shifted over 1's : " << adjAQ << endl;
+		if(totalNoOfShifts >= adjAQ.length()/2){
 				QUOTIENT = adjAQ.substr(0, adjAQ.length()/2);
 				REMAINDER = adjAQ.substr(adjAQ.length()/2+1 , adjAQ.length());
-				//cout << "we are done here";
-				//printOutput(adjAQ);
-				//adjAQ = "END";
+				
 				break;
 		}
 		else if(AQ[i] == '1'){
@@ -346,12 +338,12 @@ string shiftOverOnes(string AQ){
 		else
 			break;
 	}
-	if(noOfShiftsHere >0)
-		cout<< setw(30)<<"Shift Over 1's: " <<"."<< adjAQ.substr(0, adjAQ.length()/2) <<"  "<<adjAQ.substr(adjAQ.length()/2, adjAQ.length())<<endl;
-	
-	//cout << "Shifted over 1's : " << adjAQ << endl;
-	delay = delay + 3 * noOfShiftsHere; // each shift takes 3 * t
-	cout<<"Total Delay After shifting over 1's "<<delay<<"\n";
+	if(noOfShiftsHere >0){
+		delay = delay + 3 * noOfShiftsHere; // each shift takes 3 * t
+		cout<< setw(30)<<"Shift Over 1's: " <<"."<< adjAQ.substr(0, adjAQ.length()/2) <<"  "<<
+		adjAQ.substr(adjAQ.length()/2, adjAQ.length())<<setw(15)<<delay<<"Δt"<<endl;
+	}
+
 	return adjAQ;
 }
 
@@ -404,7 +396,7 @@ string addBitStrings( string first, string second )
 	* Tc = delay for m full bit ripple adder 
 	**/
 	delay = delay + ((first.length()/2 - 1) * 2 + 6); // 6 t for 2 bit ripple adder 
-	cout<<"Total Delay in addition: "<<delay<<"\n";
+	//cout<<"Total Delay in addition: "<<delay<<"\n";
     return result;
 }
 string substractB(string AQ, string B){
@@ -431,12 +423,96 @@ string addB(string AQ, string B){
 	A = A.append(AQ.substr(AQ.length()/2 + 1   , AQ.length()));
 	return A;
 }
+
+string properRemainder(string remainder){
+	int count = 0;
+	int len = 2 * remainder.length();
+	string properRem = "";
+	for(int i = 0 ; i < len/2; i++){
+		if(remainder[i] == '*')
+			break;
+		else
+			properRem = properRem + remainder[i];
+		count++;
+	}
+	
+	string addZeros ="";
+	for(int i = count; i < len; i++){
+		addZeros.append("0");
+	}
+
+	properRem = addZeros.append(properRem);
+	return properRem;
+}
 void printOutput(string AQ){
-	REMAINDER = AQ.substr(0, AQ.length()/2);
+	REMAINDER = properRemainder(AQ.substr(0, AQ.length()/2));
 	QUOTIENT = AQ.substr(AQ.length()/2 , AQ.length());
 
 	cout<<setw(30)<<"------------------------RESULTS-------------------------------"<<endl;
-	cout <<setw(30)<<" QUOTIENT: "<< QUOTIENT<<endl;
-	cout<<setw(30) <<" REMAINDER: "<<REMAINDER<<endl;
-	cout <<setw(30)<< "DELAY: " << delay << " dt" <<endl;
+	cout <<setw(30)<<" QUOTIENT: "<<"." << QUOTIENT<<endl;
+	cout<<setw(30) <<" REMAINDER: "<<"."<<REMAINDER<<endl;
+	cout <<setw(30)<< "DELAY: " << delay << "Δt" <<endl;
+	cout <<" \n \n \n \n";
+
+
+}
+
+int checkInvalidInputs(string AQ, string B){
+	bool allZeros = true;
+
+	//case: if the divisor is Zero
+	for(int i = 0; i < B.length(); i++){
+			if(B[i] == '1'){
+				allZeros = false;
+				break;
+			}
+	}
+	if(allZeros == true)
+		return -1;	
+
+	//case : If high K bits of AQ is greater than K bits of B, then 
+	string A = AQ.substr(0, AQ.length()/2);
+	if(A.compare(B) >= 0){
+		return -1;
+	}
+	return 0;
+}
+string convertHexToBinary(string hexaDecimal){
+	//cout <<" The number is : " << hexaDecimal.at(hexaDecimal.length() -2 )<<endl;
+	//already a binary number
+	if(hexaDecimal.at(hexaDecimal.length() -2 ) == 'y'){
+		return hexaDecimal.substr(0, hexaDecimal.length()-8);
+	}
+
+	string binaryNum = ".";
+	for(int i = 1; i < hexaDecimal.length(); i++){
+		//cout <<" THe digit is: " << hexaDecimal[i];
+         switch(hexaDecimal[i]){
+             case '0': binaryNum = binaryNum.append("0000"); break;
+             case '1': binaryNum = binaryNum.append("0001"); break;
+             case '2': binaryNum = binaryNum.append("0010"); break;
+             case '3': binaryNum = binaryNum.append("0011"); break;
+             case '4': binaryNum = binaryNum.append("0100"); break;
+             case '5': binaryNum = binaryNum.append("0101"); break;
+             case '6': binaryNum = binaryNum.append("0110"); break;
+             case '7': binaryNum = binaryNum.append("0111"); break;
+             case '8': binaryNum = binaryNum.append("1000"); break;
+             case '9': binaryNum = binaryNum.append("1001"); break;
+             case 'A': binaryNum = binaryNum.append("1010"); break;
+             case 'B': binaryNum = binaryNum.append("1011"); break;
+             case 'C': binaryNum = binaryNum.append("1100"); break;
+             case 'D': binaryNum = binaryNum.append("1101"); break;
+             case 'E': binaryNum = binaryNum.append("1110"); break;
+             case 'F': binaryNum = binaryNum.append("1111"); break;
+             case 'a': binaryNum = binaryNum.append("1010"); break;
+             case 'b': binaryNum = binaryNum.append("1011"); break;
+             case 'c': binaryNum = binaryNum.append("1100"); break;
+             case 'd': binaryNum = binaryNum.append("1101"); break;
+             case 'e': binaryNum = binaryNum.append("1110"); break;
+             case 'f': binaryNum = binaryNum.append("1111"); break;
+             default:  cout <<"\nInvalid hexadecimal digit  " << hexaDecimal[i]; 
+						return 0;
+         }
+    }
+    return binaryNum;
 }
