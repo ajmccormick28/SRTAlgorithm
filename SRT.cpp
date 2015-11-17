@@ -48,21 +48,25 @@ int main(){
 		AQ = AQ.substr(1, AQ.length());
 		B  = B.substr(1, B.length());
 
-		cout << setw(30)<<" The dividend length: " << AQ.length()<<endl;
-		cout<< setw(30)<<" The divisor length: "  << B.length()<<endl<<endl;
+		cout << setw(30)<<" The dividend length: " << AQ <<" "<<AQ.length()<<endl;
+		cout<< setw(30)<<" The divisor length: "  << B<<" "<<B.length()<<endl<<endl;
 
 		delay = 0 , totalNoOfShifts = 0;
-		int initAdj = 0, k = 0, BLen = B.length();
-		string normB = B;
+		int initAdj = 0, k = 0;
+		
 
 		//Check if the inputs are valid
 		int invalid = checkInvalidInputs(AQ, B) ;
 
-		if(invalid == -1)
-		{
-			cout <<" Invalid Inputs \n";
-		}
-		else{
+		
+		//else{
+			if(invalid == -1)
+			{
+				AQ = AQ.insert(0,"00");
+				B = B.insert(0,"0");
+				cout <<" Invalid Inputs \n";
+			}
+			string normB = B;
 			// STEP 1: normalize B
 			for(int i =0 ; i < B.length(); i++){
 				if(B[i] == '0'){
@@ -95,7 +99,8 @@ int main(){
 			// STEP 3: Adjust AQ
 
 			delay = delay + initAdj * 3; // 3 t for each shift required for adjusting AQ
-			
+			//totalNoOfShifts += initAdj;
+
 			string adjAQ = AQ;
 			for(int i = 0; i < AQ.length() ; i++){
 				if(AQ[i] == '0' && initAdj > 0 ){
@@ -105,8 +110,7 @@ int main(){
 				}
 			}
 			AQ = adjAQ;
-			totalNoOfShifts += initAdj;
-
+			
 			//print the quotient and remainder
 			if(totalNoOfShifts > AQ.length()/2){
 				printOutput(AQ);
@@ -238,7 +242,7 @@ int main(){
 			else{
 					printOutput(AQ);
 			}
-		}
+		//}
 		t++;
 	}
 }
@@ -340,7 +344,7 @@ string shiftOverOnes(string AQ){
 	}
 	if(noOfShiftsHere >0){
 		delay = delay + 3 * noOfShiftsHere; // each shift takes 3 * t
-		cout<< setw(30)<<"Shift Over 1's: " <<"."<< adjAQ.substr(0, adjAQ.length()/2) <<"  "<<
+		cout<< setw(30)<<"Shift Over 1's: " <<"1."<< adjAQ.substr(0, adjAQ.length()/2) <<"  "<<
 		adjAQ.substr(adjAQ.length()/2, adjAQ.length())<<setw(15)<<delay<<"Δt"<<endl;
 	}
 
