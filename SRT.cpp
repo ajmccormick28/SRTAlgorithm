@@ -47,7 +47,7 @@ int main(){
 	while(t < T){
 		cin >> AQ >> B;
 
-		cout <<" -----------------------Test Case: "<<t+1<<"----------------------------";
+		cout <<" -----------------------Test Case: "<<t+1<<"----------------------------\n";
 		cout <<setw(30)<<" The input is: " << AQ <<"    "<<B <<endl;
 
 		//check and convert the hexadecimal input to binary
@@ -77,8 +77,12 @@ int main(){
 		//else{
 			if(invalid == -1)
 			{
-				AQ = AQ.insert(0,"00");
-				B = B.insert(0,"0");
+				string A = AQ.substr(0,AQ.length()/2);
+				while(A.compare(B) >= 0){
+					AQ = AQ.insert(0,"00");
+					B = B.insert(0,"0");
+					A = AQ.substr(0,AQ.length()/2);
+				}
 				cout <<" Invalid Inputs \n";
 			}
 			string normB = B;
