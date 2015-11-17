@@ -131,10 +131,10 @@ int main(){
 			AQ = adjAQ;
 			
 			//print the quotient and remainder
-			if(totalNoOfShifts > AQ.length()/2){
-				printOutput(AQ);
+			// if(totalNoOfShifts > AQ.length()/2){
+			// 	printOutput(AQ);
 			
-			}
+			// }
 			cout << setw(30) << "Adjusted AQ: " << "." << adjAQ.substr(0, AQ.length()/2) << "  "<< AQ.substr(AQ.length()/2, AQ.length())<<
 			setw(15)<<delay<<"Δt"<<endl;
 
@@ -143,6 +143,7 @@ int main(){
 			
 			// check if the quotient and remainder are generated
 			if(totalNoOfShifts > B.length()){
+				//printOutput(AQ);
 				//end here;
 				cout << " End at very beginning" << endl;
 			}
@@ -156,15 +157,21 @@ int main(){
 				
 				if(isPositive == '0'){
 					//STEP 5: Substract B
-					resAQ = substractB(AQ , normB);
-					cout << setw(30)<<"Negative Result : " << resAQ.substr(0,1)<<"."<<
-					resAQ.substr(1, resAQ.length()/2)<<"  "<<resAQ.substr(resAQ.length()/2+1, resAQ.length()) 
-					<<setw(15)<<delay<<"Δt"<<endl;
+					resAQ = substractB(AQ , normB);	
 				}
 				else{
 					resAQ = addB(AQ , normB);
+				}
+
+				//Result is either positive or negative
+				if(resAQ.substr(0,1) =="1"){
+						cout << setw(30)<<"Negative Result : " << resAQ.substr(0,1)<<"."<<
+						resAQ.substr(1, resAQ.length()/2)<<"  "<<resAQ.substr(resAQ.length()/2+1, resAQ.length()) 
+						<<setw(15)<<delay<<"Δt"<<endl;
+				}
+				else{
 					cout << setw(30)<<"Positive Result : " << resAQ.substr(0,1)<<"."<<
-					resAQ.substr(1, resAQ.length()/2)<<"  "<<resAQ.substr(resAQ.length()/2+1, resAQ.length())
+					resAQ.substr(1, resAQ.length()/2)<<"  "<<resAQ.substr(resAQ.length()/2+1, resAQ.length()) 
 					<<setw(15)<<delay<<"Δt"<<endl;
 				}
 				
@@ -316,8 +323,8 @@ string shiftOverZeros(string AQ){
 	for( int i = 0 ; i < AQ.length() ; i ++){
 		if(totalNoOfShifts > adjAQ.length()/2){
 				//cout << "Shifted over 0's : " << adjAQ << endl;
-				QUOTIENT = adjAQ.substr(0, adjAQ.length()/2);
-				REMAINDER = adjAQ.substr(adjAQ.length()/2+1 , adjAQ.length());
+				//QUOTIENT = adjAQ.substr(0, adjAQ.length()/2);
+				//REMAINDER = adjAQ.substr(adjAQ.length()/2+1 , adjAQ.length());
 				//cout << "we are done here";
 				//printOutput(adjAQ);
 				break;
@@ -344,11 +351,11 @@ string shiftOverZeros(string AQ){
 string shiftOverOnes(string AQ){
 	string adjAQ = AQ;
 	int noOfShiftsHere = 0;
-	cout <<" Total number of shifts: " <<totalNoOfShifts<<" "<<adjAQ.length()<<endl;
+	//cout <<" Total number of shifts: " <<totalNoOfShifts<<" "<<adjAQ.length()<<endl;
 	for( int i = 0 ; i < AQ.length() ; i ++){
 		if(totalNoOfShifts > adjAQ.length()/2){
-				QUOTIENT = adjAQ.substr(0, adjAQ.length()/2);
-				REMAINDER = adjAQ.substr(adjAQ.length()/2+1 , adjAQ.length());
+				//QUOTIENT = adjAQ.substr(0, adjAQ.length()/2);
+				//REMAINDER = adjAQ.substr(adjAQ.length()/2+1 , adjAQ.length());
 				
 				break;
 		}
