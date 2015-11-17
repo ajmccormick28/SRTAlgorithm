@@ -26,6 +26,16 @@ void printOutput(string AQ);
 string convertHexToBinary(string hexInput);
 int checkInvalidInputs(string AQ, string B);
 string properRemainder(string AQ);
+string addZerosToFront(string str, int len){
+	string updatedStr = "";
+	for(int i =0 ; i < len; i++){
+		updatedStr = updatedStr.insert(0, "0");
+	}
+	//cout <<" sadf" << updatedStr;
+	updatedStr  = updatedStr.append(str);
+	//cout << " updated string "<<updatedStr;
+	return updatedStr;
+}
 
 int main(){
 	string Q , A , B , AQ , comB;
@@ -48,6 +58,11 @@ int main(){
 		AQ = AQ.substr(1, AQ.length());
 		B  = B.substr(1, B.length());
 
+		//check if AQ is twice the length of B
+		if(AQ.length() < 2 * B.length() ){
+			//cout << " AQ is less" <<endl;
+			AQ = addZerosToFront(AQ, 2*B.length() - AQ.length());
+		}
 		cout << setw(30)<<" The dividend length: " << AQ <<" "<<AQ.length()<<endl;
 		cout<< setw(30)<<" The divisor length: "  << B<<" "<<B.length()<<endl<<endl;
 
@@ -295,7 +310,7 @@ string shiftOverZeros(string AQ){
 	string adjAQ = AQ;
 	int noOfShiftsHere = 0;
 	for( int i = 0 ; i < AQ.length() ; i ++){
-		if(totalNoOfShifts >= adjAQ.length()/2){
+		if(totalNoOfShifts > adjAQ.length()/2){
 				//cout << "Shifted over 0's : " << adjAQ << endl;
 				QUOTIENT = adjAQ.substr(0, adjAQ.length()/2);
 				REMAINDER = adjAQ.substr(adjAQ.length()/2+1 , adjAQ.length());
@@ -325,8 +340,9 @@ string shiftOverZeros(string AQ){
 string shiftOverOnes(string AQ){
 	string adjAQ = AQ;
 	int noOfShiftsHere = 0;
+	cout <<" Total number of shifts: " <<totalNoOfShifts<<" "<<adjAQ.length()<<endl;
 	for( int i = 0 ; i < AQ.length() ; i ++){
-		if(totalNoOfShifts >= adjAQ.length()/2){
+		if(totalNoOfShifts > adjAQ.length()/2){
 				QUOTIENT = adjAQ.substr(0, adjAQ.length()/2);
 				REMAINDER = adjAQ.substr(adjAQ.length()/2+1 , adjAQ.length());
 				
