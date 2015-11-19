@@ -19,7 +19,7 @@ string shiftOverZeros(string AQ);
 string shiftOverOnes(string AQ);
 string getA(string AQ);
 string addBitStrings( string first, string second );
-string substractB(string AQ, string B);
+string subtractB(string AQ, string B);
 string addB(string AQ, string B);
 void printOutput(string AQ);
 string convertHexToBinary(string hexInput);
@@ -68,13 +68,16 @@ int main(){
 		else{
 			if(invalid == -2)
 			{
+				cout <<" First k bits of dividend (AQ) is higher than that of divisor \n We need to correct this: \n\n";
+				cout <<" We add 1 zero to divisor after the decimal and 2 zero's to the \n";
+				cout <<" dividend repeatedly unless the high k bits of dividend (AQ) \n becomes smaller than that of divisor. \n\n";
+
 				string A = AQ.substr(0,AQ.length()/2);
 				while(A.compare(B) >= 0){
 					AQ = AQ.insert(0,"00");
 					B = B.insert(0,"0");
 					A = AQ.substr(0,AQ.length()/2);
 				}
-				cout <<" Invalid Inputs \n";
 			}
 
 			string normB = B;
@@ -135,8 +138,8 @@ int main(){
 			while( totalNoOfShifts <= B.length()){
 				
 				if(isPositive == '0'){
-					//STEP 5: Substract B
-					resAQ = substractB(AQ , normB);	
+					//STEP 5: subtract B
+					resAQ = subtractB(AQ , normB);	
 				}
 				else{
 					resAQ = addB(AQ , normB);
@@ -402,13 +405,13 @@ string addBitStrings( string first, string second )
 }
 
 /*
-* Substract normalized B from A part of AQ i.e. high k bits of AQ
+* Subtract normalized B from A part of AQ i.e. high k bits of AQ
 */
-string substractB(string AQ, string B){
+string subtractB(string AQ, string B){
 	string A = getA(AQ.insert(0,"0"));
 	
 	string comB = complement(B.insert(0, "0"));
-	cout<<setw(30)<<"Substract B: "<<comB.substr(0,1)<<"."<<comB.substr(1, comB.length())<<endl;
+	cout<<setw(30)<<"Subtract B: "<<comB.substr(0,1)<<"."<<comB.substr(1, comB.length())<<endl;
 	cout << setw(40) <<" ---------"<<endl;
 	A = addBitStrings( A, comB);
 	A = A.append(AQ.substr(AQ.length()/2 + 1   , AQ.length()));
