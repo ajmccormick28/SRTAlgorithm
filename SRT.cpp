@@ -1,6 +1,5 @@
 /**
-*
-*
+* SRT Algorithm
 *
 * Vijay K Shah - 12506602 
 * Michael Jolley - 
@@ -26,16 +25,7 @@ void printOutput(string AQ);
 string convertHexToBinary(string hexInput);
 int checkInvalidInputs(string AQ, string B);
 string properRemainder(string AQ);
-string addZerosToFront(string str, int len){
-	string updatedStr = "";
-	for(int i =0 ; i < len; i++){
-		updatedStr = updatedStr.insert(0, "0");
-	}
-	//cout <<" sadf" << updatedStr;
-	updatedStr  = updatedStr.append(str);
-	//cout << " updated string "<<updatedStr;
-	return updatedStr;
-}
+string addZerosToFront(string str, int len);
 
 int main(){
 	string Q , A , B , AQ , comB;
@@ -60,22 +50,23 @@ int main(){
 
 		//check if AQ is twice the length of B
 		if(AQ.length() < 2 * B.length() ){
-			//cout << " AQ is less" <<endl;
 			AQ = addZerosToFront(AQ, 2*B.length() - AQ.length());
 		}
+
 		cout << setw(30)<<" The dividend length: " << AQ <<" "<<AQ.length()<<endl;
 		cout<< setw(30)<<" The divisor length: "  << B<<" "<<B.length()<<endl<<endl;
 
 		delay = 0 , totalNoOfShifts = 0;
 		int initAdj = 0, k = 0;
 		
-
 		//Check if the inputs are valid
 		int invalid = checkInvalidInputs(AQ, B) ;
+		if(invalid == -1){
+			cout <<" Invalid Operation: Divisor can not be Zero \n";
+		}
 
-		
-		//else{
-			if(invalid == -1)
+		else{
+			if(invalid == -2)
 			{
 				string A = AQ.substr(0,AQ.length()/2);
 				while(A.compare(B) >= 0){
@@ -85,6 +76,7 @@ int main(){
 				}
 				cout <<" Invalid Inputs \n";
 			}
+
 			string normB = B;
 			// STEP 1: normalize B
 			for(int i =0 ; i < B.length(); i++){
@@ -105,10 +97,10 @@ int main(){
 			cout << setw(30) <<"Normalized B = " << "." << normB << setw(15)<<delay << "Δt"<<endl << endl;
 			
 
-			// STEP 2: Complement B
+			// STEP 2: 2'Complement the normalized B
 			string tempNormB = normB;
 			string tempComB = complement(tempNormB.insert(0,"0"));
-			delay  = delay + B.length(); // length of operand times t
+			delay  = delay + B.length(); // length of operand times Δt
 			cout<<setw(30)<<"Complement of Normalized B = " << tempComB.substr(0,1) <<"." << tempComB.substr(1, tempComB.length()) <<"     "<<delay<<"Δt"<<endl;
 		
 
@@ -117,9 +109,8 @@ int main(){
 			
 			// STEP 3: Adjust AQ
 
-			delay = delay + initAdj * 3; // 3 t for each shift required for adjusting AQ
-			//totalNoOfShifts += initAdj;
-
+			delay = delay + initAdj * 3; // 3 Δt for each shift required for adjusting AQ
+			
 			string adjAQ = AQ;
 			for(int i = 0; i < AQ.length() ; i++){
 				if(AQ[i] == '0' && initAdj > 0 ){
@@ -130,29 +121,17 @@ int main(){
 			}
 			AQ = adjAQ;
 			
-			//print the quotient and remainder
-			// if(totalNoOfShifts > AQ.length()/2){
-			// 	printOutput(AQ);
-			
-			// }
 			cout << setw(30) << "Adjusted AQ: " << "." << adjAQ.substr(0, AQ.length()/2) << "  "<< AQ.substr(AQ.length()/2, AQ.length())<<
 			setw(15)<<delay<<"Δt"<<endl;
 
 			//STEP 4: Shift over 0's
 			adjAQ = shiftOverZeros(AQ);
 			
-			// check if the quotient and remainder are generated
-			if(totalNoOfShifts > B.length()){
-				//printOutput(AQ);
-				//end here;
-				cout << " End at very beginning" << endl;
-			}
-			//cout <<" Shifted over 0's " << adjAQ << endl;
-
 			AQ = adjAQ;
 			string resAQ;
 			char isPositive = '0'; //positive by default
 			//keep performing the operation unless total # of shifts is less than the operand bit length
+
 			while( totalNoOfShifts <= B.length()){
 				
 				if(isPositive == '0'){
@@ -181,12 +160,11 @@ int main(){
 				
 				//STEP 6.1 : If resAQ is +ve,
 				if(isPositive == '0'){
-					//cout << endl << "The result is positive: " << endl ;
-					// shift AQ left, q0 <- 1
+
 					resAQ.push_back('1');
 					resAQ = resAQ.substr(1);
 
-					delay = delay + 3; // 3 t delay for 1 shift
+					delay = delay + 3; // 3 Δt delay for 1 shift
 					
 					totalNoOfShifts += 1;
 
@@ -194,12 +172,6 @@ int main(){
 					<<resAQ.substr(0,resAQ.length()/2)<<"  "<<resAQ.substr(resAQ.length()/2,resAQ.length()) 
 					<<setw(15)<<delay<<"Δt"<< endl;
 					
-					//print the quotient and remainder
-					if(totalNoOfShifts > resAQ.length()/2){
-						AQ = resAQ;
-						//printOutput(resAQ);
-						break;
-					}
 					// shift over 0's
 					resAQ = shiftOverZeros(resAQ);
 					if(totalNoOfShifts > resAQ.length()/2){
@@ -212,26 +184,17 @@ int main(){
 				
 				//STEP 6.1 : If resAQ is -ve,
 				else if(isPositive == '1'){
-					//cout << endl << "The result is negative: " << endl ;
-					// shift AQ left, q0 <- 0
 					resAQ.push_back('0');
 					resAQ = resAQ.substr(1);
 
-					delay = delay + 3; // 3 t delay for 1 shift
-					//cout<<"Total Delay in shift AQ left and q0 <- 0" <<delay <<"\n";
+					delay = delay + 3; // 3 Δt delay for 1 shift
+					
 					totalNoOfShifts += 1;
 
 					cout <<setw(30)<<"Shift AQ left, q0 <- 0 :  " << "1"<<"."
 					<<resAQ.substr(0,resAQ.length()/2)<<"  "<<resAQ.substr(resAQ.length()/2,resAQ.length())
 					<<setw(15)<<delay<<"Δt" << endl;
 					
-
-					//print the quotient and remainder
-					if(totalNoOfShifts > resAQ.length()/2){
-						AQ = resAQ;
-						//printOutput(resAQ);
-						//break;
-					}
 					// shift over 1's
 					resAQ = shiftOverOnes(resAQ);
 					if(totalNoOfShifts > B.length()){
@@ -251,7 +214,7 @@ int main(){
 				//shift right
 				string correctA = A;
 				correctA = correctA.substr(0, A.length() - 1 );
-				delay += 3; //TODO: Verify this
+				delay += 3;
 
 				cout << setw(30)<<"Correct remainer by  " << "1."<<correctA << setw(15)<<delay<<"Δt"<<endl;
 				cout << setw(30)<<"Shifting A and adding B  " <<"."<<normB<<endl;
@@ -268,11 +231,14 @@ int main(){
 			else{
 					printOutput(AQ);
 			}
-		//}
+		}
 		t++;
 	}
 }
 
+/*
+* Get complement of any number a
+*/
 string complement (string a)
 {
 
@@ -317,16 +283,14 @@ string complement (string a)
 	return b;
 }
 
+/*
+* Shift AQ over 0's to the left and push 0 to q0
+*/
 string shiftOverZeros(string AQ){
 	string adjAQ = AQ;
 	int noOfShiftsHere = 0;
 	for( int i = 0 ; i < AQ.length() ; i ++){
 		if(totalNoOfShifts > adjAQ.length()/2){
-				//cout << "Shifted over 0's : " << adjAQ << endl;
-				//QUOTIENT = adjAQ.substr(0, adjAQ.length()/2);
-				//REMAINDER = adjAQ.substr(adjAQ.length()/2+1 , adjAQ.length());
-				//cout << "we are done here";
-				//printOutput(adjAQ);
 				break;
 		}
 		else if(AQ[i] == '0'){
@@ -348,15 +312,15 @@ string shiftOverZeros(string AQ){
 	return adjAQ;
 }
 
+/*
+* Shift AQ over 1's to the left and push 1 to q0
+*/
 string shiftOverOnes(string AQ){
 	string adjAQ = AQ;
 	int noOfShiftsHere = 0;
-	//cout <<" Total number of shifts: " <<totalNoOfShifts<<" "<<adjAQ.length()<<endl;
+
 	for( int i = 0 ; i < AQ.length() ; i ++){
 		if(totalNoOfShifts > adjAQ.length()/2){
-				//QUOTIENT = adjAQ.substr(0, adjAQ.length()/2);
-				//REMAINDER = adjAQ.substr(adjAQ.length()/2+1 , adjAQ.length());
-				
 				break;
 		}
 		else if(AQ[i] == '1'){
@@ -370,7 +334,7 @@ string shiftOverOnes(string AQ){
 			break;
 	}
 	if(noOfShiftsHere >0){
-		delay = delay + 3 * noOfShiftsHere; // each shift takes 3 * t
+		delay = delay + 3 * noOfShiftsHere; // each shift takes 3 * Δt
 		cout<< setw(30)<<"Shift Over 1's: " <<"1."<< adjAQ.substr(0, adjAQ.length()/2) <<"  "<<
 		adjAQ.substr(adjAQ.length()/2, adjAQ.length())<<setw(15)<<delay<<"Δt"<<endl;
 	}
@@ -378,10 +342,17 @@ string shiftOverOnes(string AQ){
 	return adjAQ;
 }
 
+/*
+* Get A as the high k bits of dividend AQ
+*/
 string getA(string AQ){
 	return AQ.substr(0, AQ.length()/2 + 1);
 }
 
+/*
+* Add any two numbers of equal length
+* Any number added to symbol "*" outputs "*"
+*/
 string addBitStrings( string first, string second )
 {
 	//cout<< " the A and B are : " << first << "  "<< second << endl;
@@ -416,7 +387,6 @@ string addBitStrings( string first, string second )
       //  result = '1' + result;
  	
 
-
 	/**
 	* For carry select adder with 2 bit adder block
 	* Tdelay = (n/m -1) * Ts + mTc
@@ -426,35 +396,43 @@ string addBitStrings( string first, string second )
 	* Ts = delay for multiplexer ( 2t)
 	* Tc = delay for m full bit ripple adder 
 	**/
-	delay = delay + ((first.length()/2 - 1) * 2 + 6); // 6 t for 2 bit ripple adder 
-	//cout<<"Total Delay in addition: "<<delay<<"\n";
+	delay = delay + ((first.length()/2 - 1) * 2 + 6); // 6 Δt for 2 bit ripple adder 
+	
     return result;
 }
+
+/*
+* Substract normalized B from A part of AQ i.e. high k bits of AQ
+*/
 string substractB(string AQ, string B){
 	string A = getA(AQ.insert(0,"0"));
-	//cout << " A is : " << A << endl;
 	
 	string comB = complement(B.insert(0, "0"));
 	cout<<setw(30)<<"Substract B: "<<comB.substr(0,1)<<"."<<comB.substr(1, comB.length())<<endl;
 	cout << setw(40) <<" ---------"<<endl;
-	//cout << "Complement of B: " << comB << endl;
 	A = addBitStrings( A, comB);
-	//cout << " A after substraction: " << A << endl;
 	A = A.append(AQ.substr(AQ.length()/2 + 1   , AQ.length()));
 	return A;
 }
 
+/*
+* Add normalized B to A part of AQ i.e. high k bits of AQ
+*/
 string addB(string AQ, string B){
 	string A = getA(AQ.insert(0, "1"));
-	//cout << " A is : " << A << endl;
 	A = addBitStrings(A , B.insert(0,"0"));
 	cout<<setw(30)<<"Add B: "<<"."<<B.substr(1, B.length())<<endl;
 	cout << setw(40) <<" ---------"<<endl;
-	//cout<<" A after addition: " << A << endl;
 	A = A.append(AQ.substr(AQ.length()/2 + 1   , AQ.length()));
 	return A;
 }
 
+/*
+* Create proper remainder by
+* Take all the bits after the decimal in A until the first *
+* Then, add zeros to the front of the number obtained from above equal to (2k - total bits in previous step)
+*
+*/
 string properRemainder(string remainder){
 	int count = 0;
 	int len = 2 * remainder.length();
@@ -475,6 +453,12 @@ string properRemainder(string remainder){
 	properRem = addZeros.append(properRem);
 	return properRem;
 }
+
+/*
+*
+* Output the Quotient and Remainder
+*
+*/
 void printOutput(string AQ){
 	REMAINDER = properRemainder(AQ.substr(0, AQ.length()/2));
 	QUOTIENT = AQ.substr(AQ.length()/2 , AQ.length());
@@ -488,6 +472,12 @@ void printOutput(string AQ){
 
 }
 
+/*
+* Check invalid inputs:
+* Case 1: If the divisor is zero, return -1
+* Case 2: If the high k bits of dividend (AQ) is greater or equal to total bits in B
+*
+*/
 int checkInvalidInputs(string AQ, string B){
 	bool allZeros = true;
 
@@ -504,12 +494,18 @@ int checkInvalidInputs(string AQ, string B){
 	//case : If high K bits of AQ is greater than K bits of B, then 
 	string A = AQ.substr(0, AQ.length()/2);
 	if(A.compare(B) >= 0){
-		return -1;
+		return -2;
 	}
 	return 0;
 }
+/*
+* Check if the given number is hexadecimal or binary
+* if the number is binary, it would always have a string - (binary)
+* at the end.
+* If not binary, convert the hexadecimal to binary
+*
+*/
 string convertHexToBinary(string hexaDecimal){
-	//cout <<" The number is : " << hexaDecimal.at(hexaDecimal.length() -2 )<<endl;
 	//already a binary number
 	if(hexaDecimal.at(hexaDecimal.length() -2 ) == 'y'){
 		return hexaDecimal.substr(0, hexaDecimal.length()-8);
@@ -517,7 +513,6 @@ string convertHexToBinary(string hexaDecimal){
 
 	string binaryNum = ".";
 	for(int i = 1; i < hexaDecimal.length(); i++){
-		//cout <<" THe digit is: " << hexaDecimal[i];
          switch(hexaDecimal[i]){
              case '0': binaryNum = binaryNum.append("0000"); break;
              case '1': binaryNum = binaryNum.append("0001"); break;
@@ -546,4 +541,19 @@ string convertHexToBinary(string hexaDecimal){
          }
     }
     return binaryNum;
+}
+
+/*
+* We introduce zeros after decimal in the dividend AQ if the 
+* the total bits in dividend is not TWICE the total bits in
+* divisor
+* 
+*/
+string addZerosToFront(string str, int len){
+	string updatedStr = "";
+	for(int i =0 ; i < len; i++){
+		updatedStr = updatedStr.insert(0, "0");
+	}
+	updatedStr  = updatedStr.append(str);
+	return updatedStr;
 }
